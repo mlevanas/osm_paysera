@@ -78,18 +78,24 @@ class os_redirect extends MPFPayment
 
 			$row = JTable::getInstance('OsMembership', 'Subscriber');
 
-			$row->load($id);
-
-			if (!$row->id)
+			if (!$row->load($id))
 			{
 				return false;
 			}
 
+			// If the subsctiption is active, it was processed before, return false
 			if ($row->published)
 			{
 				return false;
 			}
 
+			// Check and make sure the transaction is only processed one time
+			if ($transactionId && OSMembershipHelper::isTransactionProcessed($transactionId))
+			{
+				return false;
+			}
+
+			// This will final the process, set subscription status to active, trigger onMembershipActive event, sending emails to subscriber and admin...
 			$this->onPaymentSuccess($row, $transactionId);*/
 		}
 	}
@@ -102,6 +108,7 @@ class os_redirect extends MPFPayment
 	 */
 	protected function validate()
 	{
+		// Store data passed from payment gateway to the system to use it later
 		$this->notificationData = $_REQUEST;
 
 		// Validate the callback data, return true if it is valid and false otherwise
