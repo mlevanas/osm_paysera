@@ -43,7 +43,7 @@ This method contains code to pass necessary data to the payment gateway for proc
 3. The payment amount can be get via **$data['amount']** variable
 4. The payment description (by default, it is Payment for [PLAN_TITLE] subscription) could be accessed via **$data['item_name']** variable
 5. The currency of the payment (if need to be passed to the payment gateway) can be get from **$data['currency']** variable
-6. Some payment gateways (such as PayPal) allows you to set the URL you want to receive notification after payment completed in the payment request. If it is applied for your payment gateway, then you can pass this URL to the payment gateway inside this method, too. The URL of the payment notification URL must has this format **https://yoursitedomain.com/index.php?option=com_osmembership&task=payment_confirm&name=os_payment_plugin_name**. For example, with PayPal payment plugin, the code is 
+6. Some payment gateways (such as PayPal) allows you to set the URL you want to receive notification after payment completed in the payment request. If it is applied for your payment gateway, then you can pass this URL to the payment gateway inside this method, too. The URL of the payment notification URL must has this format **https://yoursitedomain.com/index.php?option=com_osmembership&task=payment_confirm&payment_method=os_payment_plugin_name**. For example, with PayPal payment plugin, the code is 
   ```php
   $this->setParameter('notify_url', $siteUrl . 'index.php?option=com_osmembership&task=payment_confirm&payment_method=os_paypal');
   ```
