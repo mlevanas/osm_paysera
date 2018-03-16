@@ -8,7 +8,7 @@ With a redirect base payment plugin, subscribers will be redirected to your paym
   4. A message such as "Please while we redirect you to the payment gateway for processing payment is displayed". Then after few seconds, registrant is redirected to payment gateway for processing payment
   5. After payment is completed at the payment gateway:
     * Subscriber is being redirected to subscription complete page which display a thank you message and subscription information
-    * The payment gateway notify Membership Pro and your site about the payment. The notification (usually is a post request) is sent to the following URL : https://yoursitedomain.com/index.php?option=com_osmembership&task=payment_confirm&name=os_payment_plugin_name. The payment gateway then verify the payment, if it is valid, send notification email (to subscribers and administrators), update status of the subscription record to active, trigger onMembershipActive event....
+    * The payment gateway notify Membership Pro and your site about the payment. The notification (usually is a post request) is sent to the following URL : https://yoursitedomain.com/index.php?option=com_osmembership&task=payment_confirm&payment_method=os_payment_plugin_name. The payment gateway then verify the payment, if it is valid, send notification email (to subscribers and administrators), update status of the subscription record to active, trigger onMembershipActive event....
 
 ## Payment plugin structure
 Usually, a payment plugin will contains on XML file and one PHP file :
@@ -51,7 +51,7 @@ This method contains code to pass necessary data to the payment gateway for proc
 
 ## The verifyPayment method
 
-This is the hardest part of develpping a redirect base payment plugin. For a redirect base payment plugin, after payment completed, the payment gateway will send a notification to your site (usually a POST request) to inform Membership Pro about this payment. As mentioned before, the notification URL has this format http://yoursitedomain.com/index.php?option=com_osmembership&task=payment_gateway&name=os_payment_plugin_name. Some payment gateway allows passing this URL within processPayment method, some other payment gateway requires you to config this URL by change a setting on your merchant account inside the payemnt gateway website
+This is the hardest part of develpping a redirect base payment plugin. For a redirect base payment plugin, after payment completed, the payment gateway will send a notification to your site (usually a POST request) to inform Membership Pro about this payment. As mentioned before, the notification URL has this format http://yoursitedomain.com/index.php?option=com_osmembership&task=payment_confirm&payment_method=os_payment_plugin_name. Some payment gateway allows passing this URL within processPayment method, some other payment gateway requires you to config this URL by change a setting on your merchant account inside the payemnt gateway website
 
 When the payment gateway sends notification to the above URL, the method **verifyPayment** in the payment plugin will be executed. This method will then need to verify the payment, if it is valid, update status of the subscription record, sending emails...Below is typical code structure of that method:
 
