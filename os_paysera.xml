@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install version="1.0" type="osmplugin" group="payment">
-    <name>os_redirect</name>
-    <title>MP Redirect</title>
-    <author>Tuan Pham Ngoc</author>
+    <name>os_paysera</name>
+    <title>Paysera mokėjimo įskiepis</title>
+    <author>MobStudio komanda</author>
     <creationDate>14-03-2018</creationDate>
-    <copyright>Copyright 2010 - 2018 Ossolution Team</copyright>
+    <copyright>Copyright 2021 MobStudio</copyright>
     <license>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU/GPL version 2</license>
-    <authorEmail>tuanpn@joomdonation.com</authorEmail>
-    <authorUrl>www.joomdonation.com</authorUrl>
-    <version>2.12.2</version>
-    <description>Redirect base payment plugin (like PayPal) For Membership Pro Extension</description>
+    <authorEmail>info@mobstudio.biz</authorEmail>
+    <authorUrl>mobstudio.biz</authorUrl>
+    <version>1.0</version>
+    <description>Paysera mok4jimo įskiepis OS Membership Pro komponentui</description>
     <config>
         <fields name="params">
             <fieldset name="basic" addfieldpath="/administrator/components/com_osmembership/elements">
                 <field name="mode" type="list" label="Payment Mode" description="Set to Test Mode Or Live Mode">
-                    <option value="0">Test Mode</option>
-                    <option value="1">Live Mode</option>
+                    <option value="1">Test Mode</option>
+                    <option value="0">Live Mode</option>
                 </field>
-                <!--
-                    <field name="merchant_id" type="text" size="40" label="Merchant ID" description="Enter your payment gateway Merchant ID" default=""></field>
-                    <field name="merchant_key" type="text" size="40" label="Merchant Key" description="Enter your payment gateway Merchant Key" default=""></field>
-                -->
+                <field name="project_id" type="text" size="40" label="Merchant ID" description="Paysera projekto ID, suteikiamas Paysera" default=""></field>
+                <field name="project_password" type="text" size="40" label="Merchant Key" description="Paysera projekto slaptažodis, suteikiamas Paysera" default=""></field>
                 <field name="payment_fee_amount" type="text" label="Payment Processing Fee ($)" description=""></field>
                 <field name="payment_fee_percent" type="text" label="Payment Processing Fee (%)" description=""></field>
                 <field name="ipn_log" type="list" label="Log IPN messages"
@@ -33,7 +31,7 @@
         </fields>
     </config>
     <files>
-        <filename>os_redirect.php</filename>
-        <folder>lib</folder>
+        <filename>os_paysera.php</filename>
+        <filename>WebToPay.php</filename>
     </files>
 </install>
