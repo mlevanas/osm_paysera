@@ -2,7 +2,7 @@
 
 defined('_JEXEC') or die;
 
-		require_once JPATH_SITE. '/components/com_osmembershipplugins/WebToPay.php';
+		require_once JPATH_SITE. '/components/com_osmembership/plugins/WebToPay.php';
 class os_paysera extends MPFPayment
 {
 
