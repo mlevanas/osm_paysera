@@ -1,12 +1,13 @@
 <?php
 
 defined('_JEXEC') or die;
+use Joomla\CMS\Table\Table;
 
 		require_once JPATH_SITE. '/components/com_osmembership/plugins/WebToPay.php';
 class os_paysera extends MPFPayment
 {
 
-	private $mode, $projectId, $projectPass;
+	protected $mode, $projectId, $projectPass;
 
 	/**
 	 * Constructor functions, init some parameter
@@ -18,10 +19,10 @@ class os_paysera extends MPFPayment
 	{
 		parent::__construct($params, $config);
 
-		// $this->url = 'https://bank.paysera.com/pay/';
-		// $this->mode = $params->get('mode');
-		// $this->projectId = $params->get('project_id');
-		// $this->projectPass = $params->get('project_password');
+		$this->url = 'https://bank.paysera.com/pay/';
+		$this->mode = $params->get('mode');
+		$this->projectId = $params->get('project_id');
+		$this->projectPass = $params->get('project_password');
 		// Additional constructor code goes here
 	}
 
@@ -40,13 +41,15 @@ class os_paysera extends MPFPayment
 		 * Below are sample code:
 		 */
 
+        $itemId = JFactory::getApplication()->input->getInt('ItemId', 0);
+
 		$data = [
 			'amount' => round($data['amount'], 2) * 100,
 			'currency_code', $data['currency'],
 			'country' => 'LT',
-			'callbackurl' => \Joomla\CMS\Uri\Uri::base() . '/index.php?option=com_osmembership&task=payment_confirm&payment_method=os_payment_paysera',
-			'cancelurl' => \Joomla\CMS\Uri\Uri::base() . '/index.php?option=com_osmembership&view=failure',
-			'accepturl' => \Joomla\CMS\Uri\Uri::base() . '/index.php?option=com_osmembership&view=complete',
+			'callbackurl' => \Joomla\CMS\Uri\Uri::base() . 'index.php?option=com_osmembership&task=payment_confirm&payment_method=os_paysera',
+			'cancelurl' => \Joomla\CMS\Uri\Uri::base() . 'index.php?option=com_osmembership&view=cancel&id='. $row->id. '&ItemId='. $itemId,
+			'accepturl' => \Joomla\CMS\Uri\Uri::base() . 'index.php?option=com_osmembership&view=payment&layout=complete&subscription_code='. $row->subscription_code . '&ItemId='. $itemId, 
 			'test' => $this->mode,
 			'projectid' => $this->projectId,
 			'sign_password' => $this->projectPass,
@@ -55,8 +58,8 @@ class os_paysera extends MPFPayment
 
 		try {
 			$request_data = WebToPay::buildRequest($data);
-			$this->setParameter('data', round($request_data['data'], 2) * 100); //konvertuojami i centus
-			$this->setParameter('sign', $data['sign']);
+			$this->setParameter('data', $request_data['data']); //konvertuojami i centus
+			$this->setParameter('sign', $request_data['sign']);
 			$this->renderRedirectForm();
 		} catch (\Exception $ex) {
 			
@@ -71,37 +74,44 @@ class os_paysera extends MPFPayment
 	 */
 	public function verifyPayment()
 	{
+	    
+		$this->logGatewayData(sprintf('Transaction started'));
 		if ($this->validate()) {
 			$id            = $this->notificationData['orderid'];
 			$transactionId = $this->notificationData['requestid'];
 
-			$row = JTable::getInstance('OsMembership', 'Subscriber');
+			$row = Table::getInstance('Subscriber', 'OSMembershipTable');
 
 			if (!$row->load($id))
 			{
+			    	$this->logGatewayData(sprintf('Invalid Subscription ID %s', $id));
 				return false;
 			}
 
 			// If the subsctiption is active, it was processed before, return false
 			if ($row->published)
 			{
-				return false;
+		    	$this->logGatewayData(sprintf('Subscription is already active'));
+		    	return false;
 			}
 
 			// Check and make sure the transaction is only processed one time
 			if ($transactionId && OSMembershipHelper::isTransactionProcessed($transactionId))
 			{
+			    
+		    	$this->logGatewayData(sprintf('Transaction %s already processed', $transactionId));
 				return false;
 			}
 
-
-			echo 'OK';
 			// This will final the process, set subscription status to active, trigger onMembershipActive event, sending emails to subscriber and admin...
-			$this->onPaymentSuccess($row, $transactionId);
 		} 
 		else{
+		    $this->logGatewayData(sprintf('Transaction validation failed'));
 			return false;
 		}
+		$this->logGatewayData(sprintf('Transaction successful'));
+		echo 'OK';
+		$this->onPaymentSuccess($row, $transactionId);
 	}
 
 	// private function validateResponse($order, $response)
@@ -126,7 +136,7 @@ class os_paysera extends MPFPayment
 	protected function validate()
 	{
 		// Store data passed from payment gateway to the system to use it later
-		$this->notificationData = $_REQUEST;
+		$this->notificationData = $_POST;
 		
 
 		$response = WebToPay::validateAndParseData($this->notificationData, $this->projectId, $this->projectPass);
