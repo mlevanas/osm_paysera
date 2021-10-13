@@ -104,14 +104,15 @@ class os_paysera extends MPFPayment
 			}
 
 			// This will final the process, set subscription status to active, trigger onMembershipActive event, sending emails to subscriber and admin...
+			$this->logGatewayData(sprintf('Transaction successful'));
+			echo 'OK';
+			$this->onPaymentSuccess($row, $transactionId);
 		} 
 		else{
 		    $this->logGatewayData(sprintf('Transaction validation failed'));
 			return false;
 		}
-		$this->logGatewayData(sprintf('Transaction successful'));
-		echo 'OK';
-		$this->onPaymentSuccess($row, $transactionId);
+		
 	}
 
 	// private function validateResponse($order, $response)
